@@ -1,0 +1,93 @@
+---
+title: "Data_Merge"
+author: "Fiona R Lodge"
+date: "May 10, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Project Statement
+
+The purpose of this project is to develop insight into weather patterns that may trigger migraines.  Since barometric pressure is often a trigger, this variable was studying with more intent than the other meteorlogical data.  Data was collected from the NOAA by submitting an order at the site: https://www.ncdc.noaa.gov/cdo-web/datasets.  The sample chosen was 'local climatology data'.  Data was chosen from 20 cities in the US from 2013-2018.  The output of the order was in a csv format, and R was used as the chosen program.
+
+## Data Wrangling to merge csvs
+The first step of the data wrangling process was to merge the csvs from the 20 cities into one csv.  First, the csvs were moved into one folder called 'States_Data', and the working directory was set.
+
+```{r setwd}
+setwd("~/Documents/Masters_Year_2/weather_project_final/States_Data")
+```
+
+Then, all filenames were read into a list from the directory.
+
+```{r list}
+filenames <- list.files(full.names = TRUE)
+```
+
+
+A function was created to read in each file as a csv.
+```{r readcsvs}
+All <- lapply(filenames, function(i){
+  read.csv(i, header = FALSE, skip = 1)})
+```
+
+All the csvs were merged on rows.
+```{r rbind}
+df_ALL <- do.call(rbind.data.frame, All)
+```
+
+I had to retype all of the names of the header of the csv.
+
+```{r names}
+names(df_ALL) <- c('STATION', 'STATION_NAME',	'ELEVATION',	
+'LATITUDE', 'LONGITUDE',	'DATE',	'REPORTTPYE',	'HOURLYSKYCONDITIONS',
+'HOURLYVISIBILITY',	'HOURLYPRSENTWEATHERTYPE',	'HOURLYDRYBULBTEMPF',
+'HOURLYDRYBULBTEMPC',	'HOURLYWETBULBTEMPF',	'HOURLYWETBULBTEMPC',
+'HOURLYDewPointTempF',	'HOURLYDewPointTempC',	'HOURLYRelativeHumidity',
+'HOURLYWindSpeed',	'HOURLYWindDirection',	'HOURLYWindGustSpeed',
+'HOURLYStationPressure',	'HOURLYPressureTendency',	'HOURLYPressureChange',
+'HOURLYSeaLevelPressure',	'HOURLYPrecip',	'HOURLYAltimeterSetting',
+'DAILYMaximumDryBulbTemp',	'DAILYMinimumDryBulbTemp',	'DAILYAverageDryBulbTemp',
+'DAILYDeptFromNormalAverageTemp',	'DAILYAverageRelativeHumidity','DAILYAverageDewPointTemp',
+'DAILYAverageWetBulbTemp',	'DAILYHeatingDegreeDays',	'DAILYCoolingDegreeDays',	'
+DAILYSunrise',	'DAILYSunset',	'DAILYWeather',	'DAILYPrecip',	'DAILYSnowfall',
+'DAILYSnowDepth',	'DAILYAverageStationPressure',	'DAILYAverageSeaLevelPressure',
+'DAILYAverageWindSpeed',	'DAILYPeakWindSpeed',	'PeakWindDirection',
+'DAILYSustainedWindSpeed',	'DAILYSustainedWindDirection',	'MonthlyMaximumTemp',
+'MonthlyMinimumTemp',	'MonthlyMeanTemp',	'MonthlyAverageRH',	'MonthlyDewpointTemp',
+'MonthlyWetBulbTemp',	'MonthlyAvgHeatingDegreeDays',	'MonthlyAvgCoolingDegreeDays',
+'MonthlyStationPressure',	'MonthlySeaLevelPressure','MonthlyAverageWindSpeed',
+'MonthlyTotalSnowfall',	'MonthlyDeptFromNormalMaximumTemp',	'MonthlyDeptFromNormalMinimumTemp',
+'MonthlyDeptFromNormalAverageTemp',	'MonthlyDeptFromNormalPrecip',
+'MonthlyTotalLiquidPrecip',	'MonthlyGreatestPrecip',	'MonthlyGreatestPrecipDate',
+'MonthlyGreatestSnowfall',	'MonthlyGreatestSnowfallDate',	'MonthlyGreatestSnowDepth',
+'MonthlyGreatestSnowDepthDate',	'MonthlyDaysWithGT90Temp',	'MonthlyDaysWithLT32Temp',
+'MonthlyDaysWithGT32Temp',	'MonthlyDaysWithLT0Temp',	'MonthlyDaysWithGT001Precip',
+'MonthlyDaysWithGT010Precip',	'MonthlyDaysWithGT1Snow',	'MonthlyMaxSeaLevelPressureValue',
+'MonthlyMaxSeaLevelPressureDate',	'MonthlyMaxSeaLevelPressureTime',	
+'MonthlyMinSeaLevelPressureValue',	'MonthlyMinSeaLevelPressureDate',
+'MonthlyMinSeaLevelPressureTime',	'MonthlyTotalHeatingDegreeDays',	
+'MonthlyTotalCoolingDegreeDays',	'MonthlyDeptFromNormalHeatingDD',	
+'MonthlyDeptFromNormalCoolingDD',	'MonthlyTotalSeasonToDateHeatingDD',	
+'MonthlyTotalSeasonToDateCoolingDD')
+```
+
+The next step was a bit of a moot point as I had to redo it in python, but changed the date format in place.
+
+```{r date}
+df_ALL['DATE'] = as.POSIXct(df_ALL$DATE)
+```
+
+View the dim and str of the data frame to make sure it makes sense.
+```{r dim}
+dim(df_ALL)
+str(df_ALL)
+```
+
+Write the dataframe as a csv. Note: this had already been done, so weather_data.csv is the file used elsewhere.
+```{r csv}
+#write.csv(df_ALL, "weather_data.csv")
+```
+
